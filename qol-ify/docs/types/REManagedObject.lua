@@ -1,0 +1,62 @@
+---@diagnostic disable:unused-local
+
+---REManagedObjects are the basic building blocks of most types in the engine (unless they're native types).
+---They are returned from methods like:
+--- - sdk.call_native_func
+--- - sdk.call_object_func
+--- - sdk.get_managed_singleton
+--- - REManagedObject:call
+---Example usage:
+---```
+---local scene_manager = sdk.get_native_singleton("via.SceneManager")
+---local scene_manager_type = sdk.find_type_definition("via.SceneManager")
+---local scene = sdk.call_native_func(scene_manager, scene_manager_type, "get_CurrentScene")
+---
+----- Scene is an REManagedObject
+---if scene ~= nil then
+---    local current_timescale = scene:call("get_TimeScale")
+---    log.info("Current timescale: " .. tostring(current_timescale))
+---
+---    scene:call("set_TimeScale", 5.0)
+---end
+---```
+---
+---Custom indexers
+---```
+---self.foo
+---```
+---If foo is a field or method of the object, returns either the field or REMethodDefinition if it exists.
+---```
+---self:foo(bar, baz)
+---```
+---If foo is a method of the object, calls foo with the supplied arguments.
+---If the method is an overloaded function, you must instead use self:call(name, args...) with the correct function prototype, as this does not deduce the correct function based on the passed arguments.
+---```
+---self.foo = bar
+---```
+---If foo is a field of the object, assigns the value bar to the field.
+---This automatically handles the reference counting for the old and new field. Do not use :force_release() and :add_ref_permanent() in this case to handle the references.
+---```
+---self[i]
+---```
+---Checks if the object has a get_Item method and calls it with i.
+---```
+---self[i] = foo
+---```
+---Checks if the object has a set_Item method and calls it with i and foo as the respective parameters.
+---@class REManagedObject
+local _REManagedObject = {}
+
+---Return value is dependent on the method's return type. Wrapper over sdk.call_object_func.
+---Full function prototype can be passed as method_name if there are multiple functions with the same name but different parameters.
+---e.g.
+---```
+---self:call("foo(System.String, System.Single, System.UInt32, System.Object)", a, b, c, d)
+---```
+---Valid method names can be found in the Object Explorer. Find the type you're looking for, and valid methods will be found under TDB Methods.
+---@param method_name string
+---@param ... unknown
+function _REManagedObject:call(method_name, ...) end
+
+---@class REManagedObject
+REManagedObject = log ---@diagnostic disable-line
